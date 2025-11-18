@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="9x9数独パズルゲーム - 自動生成で難易度表示付き">
+    <meta name="theme-color" content="#2c3e50">
+    <title>数独ゲーム</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>数独ゲーム</h1>
+        </header>
+        
+        <div class="game-info">
+            <div class="difficulty">
+                <span class="label">難易度:</span>
+                <span id="difficulty-level">-</span>
+            </div>
+            <div class="progress" id="progress-container" style="display: none;">
+                <span id="progress-text">生成中...</span>
+            </div>
+        </div>
+
+        <div id="sudoku-board" class="sudoku-board"></div>
+
+        <div class="controls">
+            <button id="regenerate-btn" class="btn btn-primary">問題を再生成</button>
+            <button id="check-btn" class="btn btn-secondary">解答チェック</button>
+        </div>
+
+        <div id="install-container" class="install-container" style="display: none;">
+            <button id="install-btn" class="btn btn-install">アプリをインストール</button>
+        </div>
+
+        <div id="message" class="message"></div>
+    </div>
+
+    <script src="sudoku.js"></script>
+</body>
+</html>
