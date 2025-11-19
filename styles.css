@@ -88,29 +88,27 @@ header h1 {
     transition: background 0.2s;
 }
 
-.sudoku-cell input {
+.sudoku-cell .cell-display {
     width: 100%;
     height: 100%;
-    border: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     text-align: center;
     font-size: 1em;
     font-weight: bold;
     background: transparent;
     color: #667eea;
-}
-
-.sudoku-cell input:focus {
-    outline: none;
-    background: #e3f2fd;
+    user-select: none;
 }
 
 .sudoku-cell.fixed {
     background: #ecf0f1;
+    cursor: default;
 }
 
-.sudoku-cell.fixed input {
+.sudoku-cell.fixed .cell-display {
     color: #2c3e50;
-    cursor: default;
 }
 
 .sudoku-cell.error {
@@ -139,7 +137,7 @@ header h1 {
     outline-offset: -3px;
 }
 
-.sudoku-cell.selected input {
+.sudoku-cell.selected .cell-display {
     background: transparent;
 }
 

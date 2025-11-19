@@ -33,7 +33,7 @@ class SudokuGame {
 
     /**
      * 数独ボードのUIを作成
-     * 9x9のグリッドを生成し、各セルに入力フィールドを配置
+     * 9x9のグリッドを生成し、各セルに数字表示用のdivを配置
      */
     createBoard() {
         const board = document.getElementById('sudoku-board');
@@ -44,41 +44,20 @@ class SudokuGame {
             const cell = document.createElement('div');
             cell.className = 'sudoku-cell';
             
-            const input = document.createElement('input');
-            input.type = 'text';
-            input.maxLength = 1;
-            input.dataset.index = i;
+            const display = document.createElement('div');
+            display.className = 'cell-display';
+            display.dataset.index = i;
             
             // セルクリック時の選択処理
-            input.addEventListener('click', () => {
-                if (!input.disabled) {
+            cell.addEventListener('click', () => {
+                if (!cell.classList.contains('fixed')) {
                     this.selectCell(i);
                 }
             });
 
-            // フォーカス時の選択処理
-            input.addEventListener('focus', () => {
-                if (!input.disabled) {
-                    this.selectCell(i);
-                }
-            });
-            
-            // 数字のみ入力可能（キーボード入力も残す）
-            input.addEventListener('input', (e) => {
-                const value = e.target.value;
-                if (value && !/^[1-9]$/.test(value)) {
-                    e.target.value = '';
-                } else if (value) {
-                    // エラー・正解のクラスをリセット
-                    cell.classList.remove('correct', 'error');
-                    // 番号ボタンの状態を更新
-                    this.updateNumberButtons();
-                }
-            });
-
-            cell.appendChild(input);
+            cell.appendChild(display);
             board.appendChild(cell);
-            this.cells.push({ cell, input });
+            this.cells.push({ cell, display });
         }
     }
 
@@ -168,7 +147,7 @@ class SudokuGame {
                 const cellRow = blockRow + i;
                 const cellCol = blockCol + j;
                 const cellIndex = cellRow * 9 + cellCol;
-                const value = this.cells[cellIndex].input.value;
+                const value = this.cells[cellIndex].display.textContent;
                 if (value) {
                     existingNumbers.add(value);
                 }
@@ -189,13 +168,13 @@ class SudokuGame {
     inputNumber(number) {
         if (this.selectedCellIndex === null) return;
         
-        const { cell, input } = this.cells[this.selectedCellIndex];
+        const { cell, display } = this.cells[this.selectedCellIndex];
         
         // 固定セルには入力できない
-        if (input.disabled) return;
+        if (cell.classList.contains('fixed')) return;
         
         // 数字を入力
-        input.value = number;
+        display.textContent = number;
         
         // エラー・正解のクラスをリセット
         cell.classList.remove('correct', 'error');
@@ -386,20 +365,18 @@ class SudokuGame {
             const col = i % 9;
             const value = this.puzzle[row][col];
             
-            const { cell, input } = this.cells[i];
+            const { cell, display } = this.cells[i];
             
             // クラスをリセット
             cell.className = 'sudoku-cell';
             
             if (value !== 0) {
                 // 固定セル（問題の一部）
-                input.value = value;
-                input.disabled = true;
+                display.textContent = value;
                 cell.classList.add('fixed');
             } else {
                 // 入力可能セル
-                input.value = '';
-                input.disabled = false;
+                display.textContent = '';
             }
         }
         
@@ -418,12 +395,12 @@ class SudokuGame {
         for (let i = 0; i < 81; i++) {
             const row = Math.floor(i / 9);
             const col = i % 9;
-            const { cell, input } = this.cells[i];
+            const { cell, display } = this.cells[i];
 
             // 固定セルはスキップ
-            if (input.disabled) continue;
+            if (cell.classList.contains('fixed')) continue;
 
-            const userValue = input.value ? parseInt(input.value) : 0;
+            const userValue = display.textContent ? parseInt(display.textContent) : 0;
             
             if (userValue === 0) {
                 allFilled = false;
