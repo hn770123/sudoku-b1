@@ -173,7 +173,27 @@ class SudokuGame {
         // 固定セルには入力できない
         if (cell.classList.contains('fixed')) return;
         
-        // 数字を入力
+        // 入力しようとしている数字が正解かチェック
+        const row = Math.floor(this.selectedCellIndex / 9);
+        const col = this.selectedCellIndex % 9;
+        const correctAnswer = this.solution[row][col];
+        
+        if (parseInt(number) !== correctAnswer) {
+            // 間違った答えの場合、数字を入力せず色で警告
+            cell.classList.remove('correct');
+            cell.classList.add('error');
+            
+            // 1秒後に色を戻す
+            setTimeout(() => {
+                if (display.textContent === '') {
+                    cell.classList.remove('error');
+                }
+            }, 1000);
+            
+            return; // 数字を入力しない
+        }
+        
+        // 正解の場合のみ数字を入力
         display.textContent = number;
         
         // エラー・正解のクラスをリセット
