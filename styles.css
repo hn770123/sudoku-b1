@@ -269,6 +269,102 @@ header h1 {
     color: #0c5460;
 }
 
+/* 祝賀オーバーレイ */
+.congratulations-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* 紙吹雪キャンバス */
+.confetti-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+/* 祝賀コンテンツ */
+.congratulations-content {
+    position: relative;
+    text-align: center;
+    z-index: 1001;
+}
+
+/* 祝賀テキスト */
+.congratulations-text {
+    font-size: 4em;
+    font-weight: bold;
+    background: linear-gradient(45deg, #ff6b6b, #feca57, #48dbfb, #ff9ff3, #ff6b6b);
+    background-size: 300% 300%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+    animation: gradientMove 3s ease infinite, bounce 1s ease-in-out infinite;
+    margin-bottom: 30px;
+    filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.8));
+}
+
+@keyframes gradientMove {
+    0%, 100% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+}
+
+@keyframes bounce {
+    0%, 100% {
+        transform: translateY(0) scale(1);
+    }
+    50% {
+        transform: translateY(-20px) scale(1.05);
+    }
+}
+
+/* オーバーレイを閉じるボタン */
+.btn-close-overlay {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 15px 40px;
+    font-size: 1.2em;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.5);
+    transition: all 0.3s ease;
+}
+
+.btn-close-overlay:hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 15px 40px rgba(102, 126, 234, 0.7);
+}
+
+.btn-close-overlay:active {
+    transform: translateY(-1px) scale(1.02);
+}
+
 /* レスポンシブ対応 */
 @media (max-width: 600px) {
     .container {
@@ -299,5 +395,15 @@ header h1 {
 
     .btn {
         width: 100%;
+    }
+
+    .congratulations-text {
+        font-size: 2em;
+        padding: 0 20px;
+    }
+
+    .btn-close-overlay {
+        padding: 12px 30px;
+        font-size: 1em;
     }
 }

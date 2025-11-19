@@ -17,6 +17,10 @@ class SudokuGame {
         this.cells = [];
         // 選択されているセルのインデックス
         this.selectedCellIndex = null;
+        // 紙吹雪のパーティクル配列
+        this.confetti = [];
+        // 紙吹雪のアニメーションID
+        this.confettiAnimationId = null;
         
         this.init();
     }
@@ -100,6 +104,11 @@ class SudokuGame {
                 }
                 deferredPrompt = null;
             }
+        });
+
+        // 祝賀オーバーレイを閉じるボタン
+        document.getElementById('close-overlay-btn').addEventListener('click', () => {
+            this.hidecongratulationsOverlay();
         });
     }
 
@@ -448,6 +457,8 @@ class SudokuGame {
             this.showMessage('まだ空きマスがあります', 'info');
         } else if (allCorrect) {
             this.showMessage('おめでとうございます！正解です！', 'success');
+            // 祝賀オーバーレイを表示
+            this.showCongratulationsOverlay();
         } else {
             this.showMessage('間違いがあります。赤いマスを確認してください。', 'error');
         }
@@ -465,6 +476,102 @@ class SudokuGame {
         if (type) {
             messageEl.classList.add(type);
         }
+    }
+
+    /**
+     * 祝賀オーバーレイを表示
+     * パズル完成時に呼ばれ、紙吹雪アニメーションと共に表示
+     */
+    showCongratulationsOverlay() {
+        const overlay = document.getElementById('congratulations-overlay');
+        overlay.style.display = 'flex';
+        
+        // 紙吹雪アニメーションを開始
+        this.initConfetti();
+        this.animateConfetti();
+    }
+
+    /**
+     * 祝賀オーバーレイを非表示
+     * ユーザーが閉じるボタンを押した時に呼ばれる
+     */
+    hidecongratulationsOverlay() {
+        const overlay = document.getElementById('congratulations-overlay');
+        overlay.style.display = 'none';
+        
+        // 紙吹雪アニメーションを停止
+        if (this.confettiAnimationId) {
+            cancelAnimationFrame(this.confettiAnimationId);
+            this.confettiAnimationId = null;
+        }
+        this.confetti = [];
+    }
+
+    /**
+     * 紙吹雪を初期化
+     * キャンバスサイズを設定し、パーティクルを生成
+     */
+    initConfetti() {
+        const canvas = document.getElementById('confetti-canvas');
+        const ctx = canvas.getContext('2d');
+        
+        // キャンバスサイズをウィンドウサイズに合わせる
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        
+        // 紙吹雪のパーティクルを生成
+        this.confetti = [];
+        const colors = ['#ff6b6b', '#feca57', '#48dbfb', '#ff9ff3', '#54a0ff', '#5f27cd'];
+        
+        for (let i = 0; i < 150; i++) {
+            this.confetti.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height - canvas.height,
+                size: Math.random() * 10 + 5,
+                speedY: Math.random() * 3 + 2,
+                speedX: Math.random() * 2 - 1,
+                color: colors[Math.floor(Math.random() * colors.length)],
+                rotation: Math.random() * 360,
+                rotationSpeed: Math.random() * 10 - 5
+            });
+        }
+    }
+
+    /**
+     * 紙吹雪をアニメーション
+     * requestAnimationFrameを使用して連続的に描画
+     */
+    animateConfetti() {
+        const canvas = document.getElementById('confetti-canvas');
+        const ctx = canvas.getContext('2d');
+        
+        // キャンバスをクリア
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        // 各パーティクルを更新して描画
+        this.confetti.forEach((particle) => {
+            // 位置を更新
+            particle.y += particle.speedY;
+            particle.x += particle.speedX;
+            particle.rotation += particle.rotationSpeed;
+            
+            // 画面外に出たら上に戻す
+            if (particle.y > canvas.height) {
+                particle.y = -10;
+                particle.x = Math.random() * canvas.width;
+            }
+            
+            // パーティクルを描画
+            ctx.save();
+            ctx.translate(particle.x, particle.y);
+            ctx.rotate(particle.rotation * Math.PI / 180);
+            ctx.fillStyle = particle.color;
+            ctx.fillRect(-particle.size / 2, -particle.size / 2, particle.size, particle.size);
+            ctx.restore();
+        });
+        
+        // 次のフレームをリクエスト
+        this.confettiAnimationId = requestAnimationFrame(() => this.animateConfetti());
     }
 }
 
