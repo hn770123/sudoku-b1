@@ -183,12 +183,20 @@ class SudokuGame {
             cell.classList.remove('correct');
             cell.classList.add('error');
             
+            // エラーメッセージを表示
+            this.showMessage('不正解です。正解の数字を選んでください。', 'error');
+            
             // 1秒後に色を戻す
             setTimeout(() => {
                 if (display.textContent === '') {
                     cell.classList.remove('error');
                 }
             }, 1000);
+            
+            // 2秒後にメッセージを消す
+            setTimeout(() => {
+                this.showMessage('', '');
+            }, 2000);
             
             return; // 数字を入力しない
         }
