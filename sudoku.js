@@ -15,6 +15,8 @@ class SudokuGame {
         this.difficulty = '';
         // セル要素の参照を保持
         this.cells = [];
+        // 選択されているセルのインデックス
+        this.selectedCellIndex = null;
         
         this.init();
     }
@@ -47,11 +49,30 @@ class SudokuGame {
             input.maxLength = 1;
             input.dataset.index = i;
             
-            // 数字のみ入力可能
+            // セルクリック時の選択処理
+            input.addEventListener('click', () => {
+                if (!input.disabled) {
+                    this.selectCell(i);
+                }
+            });
+
+            // フォーカス時の選択処理
+            input.addEventListener('focus', () => {
+                if (!input.disabled) {
+                    this.selectCell(i);
+                }
+            });
+            
+            // 数字のみ入力可能（キーボード入力も残す）
             input.addEventListener('input', (e) => {
                 const value = e.target.value;
                 if (value && !/^[1-9]$/.test(value)) {
                     e.target.value = '';
+                } else if (value) {
+                    // エラー・正解のクラスをリセット
+                    cell.classList.remove('correct', 'error');
+                    // 番号ボタンの状態を更新
+                    this.updateNumberButtons();
                 }
             });
 
@@ -74,6 +95,15 @@ class SudokuGame {
             this.checkSolution();
         });
 
+        // 番号ボタンのイベントリスナー
+        const numberButtons = document.querySelectorAll('.number-btn');
+        numberButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const number = btn.dataset.number;
+                this.inputNumber(number);
+            });
+        });
+
         // PWAインストールイベント
         let deferredPrompt;
         window.addEventListener('beforeinstallprompt', (e) => {
@@ -92,6 +122,86 @@ class SudokuGame {
                 deferredPrompt = null;
             }
         });
+    }
+
+    /**
+     * セルを選択
+     * @param {number} index - セルのインデックス
+     */
+    selectCell(index) {
+        // 以前の選択を解除
+        if (this.selectedCellIndex !== null) {
+            this.cells[this.selectedCellIndex].cell.classList.remove('selected');
+        }
+        
+        // 新しいセルを選択
+        this.selectedCellIndex = index;
+        this.cells[index].cell.classList.add('selected');
+        
+        // 番号ボタンの状態を更新
+        this.updateNumberButtons();
+    }
+
+    /**
+     * 番号ボタンの有効/無効を更新
+     * 選択されたセルが属する3x3ブロック内の既存数字を確認
+     */
+    updateNumberButtons() {
+        const numberButtons = document.querySelectorAll('.number-btn');
+        
+        // セルが選択されていない場合はすべて無効化
+        if (this.selectedCellIndex === null) {
+            numberButtons.forEach(btn => btn.disabled = true);
+            return;
+        }
+        
+        // 選択されたセルの行、列、3x3ブロックを取得
+        const row = Math.floor(this.selectedCellIndex / 9);
+        const col = this.selectedCellIndex % 9;
+        const blockRow = Math.floor(row / 3) * 3;
+        const blockCol = Math.floor(col / 3) * 3;
+        
+        // 3x3ブロック内の既存の数字を収集
+        const existingNumbers = new Set();
+        for (let i = 0; i < 3; i++) {
+            for (let j = 0; j < 3; j++) {
+                const cellRow = blockRow + i;
+                const cellCol = blockCol + j;
+                const cellIndex = cellRow * 9 + cellCol;
+                const value = this.cells[cellIndex].input.value;
+                if (value) {
+                    existingNumbers.add(value);
+                }
+            }
+        }
+        
+        // ボタンの有効/無効を設定
+        numberButtons.forEach(btn => {
+            const number = btn.dataset.number;
+            btn.disabled = existingNumbers.has(number);
+        });
+    }
+
+    /**
+     * 選択されたセルに数字を入力
+     * @param {string} number - 入力する数字（1-9）
+     */
+    inputNumber(number) {
+        if (this.selectedCellIndex === null) return;
+        
+        const { cell, input } = this.cells[this.selectedCellIndex];
+        
+        // 固定セルには入力できない
+        if (input.disabled) return;
+        
+        // 数字を入力
+        input.value = number;
+        
+        // エラー・正解のクラスをリセット
+        cell.classList.remove('correct', 'error');
+        
+        // 番号ボタンの状態を更新
+        this.updateNumberButtons();
     }
 
     /**
@@ -268,6 +378,9 @@ class SudokuGame {
      * 固定セルと入力可能セルを区別して表示
      */
     displayPuzzle() {
+        // 選択状態をリセット
+        this.selectedCellIndex = null;
+        
         for (let i = 0; i < 81; i++) {
             const row = Math.floor(i / 9);
             const col = i % 9;
@@ -289,6 +402,9 @@ class SudokuGame {
                 input.disabled = false;
             }
         }
+        
+        // 番号ボタンの状態を更新
+        this.updateNumberButtons();
     }
 
     /**
