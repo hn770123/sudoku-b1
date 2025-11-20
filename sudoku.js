@@ -357,7 +357,8 @@ class SudokuGame {
         const puzzle = this.solution.map(row => [...row]);
         
         // 間引く数を決定（難易度に影響）
-        const cellsToRemove = 40 + Math.floor(Math.random() * 21); // 40-60個を間引く
+        // より簡単にするため、間引く数を減らす（30-45個）
+        const cellsToRemove = 30 + Math.floor(Math.random() * 16); // 30-45個を間引く
         const positions = [];
         
         // すべてのセル位置を配列に格納
@@ -378,9 +379,9 @@ class SudokuGame {
 
         // 難易度を判定（間引いた数で判定）
         let difficulty;
-        if (cellsToRemove < 45) {
+        if (cellsToRemove < 36) {
             difficulty = '簡単';
-        } else if (cellsToRemove < 52) {
+        } else if (cellsToRemove < 41) {
             difficulty = '普通';
         } else {
             difficulty = '難しい';
